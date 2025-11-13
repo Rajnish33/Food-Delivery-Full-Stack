@@ -8,22 +8,46 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const placeOrder = async (req, res) => {
   const frontend_url = "https://food-delivery-frontend-s2l9.onrender.com";
   try {
+    // Backend multiplier for prices (final price = original * BACKEND_PRICE_MULTIPLIER)
+    const MULTIPLIER = parseFloat(process.env.BACKEND_PRICE_MULTIPLIER) || 0.3;
+
+    // Recalculate amounts on server to ensure charges use discounted prices
+    let orderItems = req.body.items.map((item) => {
+      const price = Number(item.price) || 0;
+      const adjustedPrice = price * MULTIPLIER;
+      return {
+        _id: item._id,
+        name: item.name,
+        price: adjustedPrice,
+        quantity: item.quantity,
+      };
+    });
+
+    const deliveryCharge = 2; // original delivery in USD
+    const adjustedDelivery = deliveryCharge * MULTIPLIER;
+
+    // compute total amount (in USD)
+    const totalAmount = orderItems.reduce(
+      (sum, it) => sum + it.price * it.quantity,
+      0
+    ) + adjustedDelivery;
+
     const newOrder = new orderModel({
       userId: req.body.userId,
-      items: req.body.items,
-      amount: req.body.amount,
+      items: orderItems,
+      amount: totalAmount,
       address: req.body.address,
     });
     await newOrder.save();
     await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
 
-    const line_items = req.body.items.map((item) => ({
+    const line_items = orderItems.map((item) => ({
       price_data: {
         currency: "usd",
         product_data: {
           name: item.name,
         },
-        unit_amount: item.price * 100,
+        unit_amount: Math.round(item.price * 100),
       },
       quantity: item.quantity,
     }));
@@ -34,7 +58,7 @@ const placeOrder = async (req, res) => {
         product_data: {
           name: "Delivery Charges",
         },
-        unit_amount: 2 * 100,
+        unit_amount: Math.round(adjustedDelivery * 100),
       },
       quantity: 1,
     });

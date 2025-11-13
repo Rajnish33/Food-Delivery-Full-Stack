@@ -4,6 +4,7 @@ import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from 'react-router-dom'
+import formatCurrencyINR from "../../utils/formatCurrency";
 
 const PlaceOrder = () => {
   const navigate= useNavigate();
@@ -152,18 +153,18 @@ const PlaceOrder = () => {
           <div>
             <div className="cart-total-details">
               <p>Subtotals</p>
-              <p>${getTotalCartAmount()}</p>
+              <p>{formatCurrencyINR(getTotalCartAmount())}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-              <p>${getTotalCartAmount() === 0 ? 0 : 2}</p>
+              <p>{formatCurrencyINR(getTotalCartAmount() === 0 ? 0 : 2)}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
               <b>
-                ${getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}
+                {formatCurrencyINR(getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2)}
               </b>
             </div>
           </div>

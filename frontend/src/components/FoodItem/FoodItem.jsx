@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import "./FoodItem.css";
 import { assets } from "../../assets/frontend_assets/assets";
 import { StoreContext } from "../../context/StoreContext";
+import formatCurrencyINR from "../../utils/formatCurrency";
 
 const FoodItem = ({ id, name, price, description, image }) => {
   const {cartItems,addToCart,removeFromCart,url}=useContext(StoreContext); 
@@ -31,7 +32,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
           <img src={assets.rating_starts} alt="" />
         </div>
         <p className="food-item-desc">{description}</p>
-        <p className="food-item-price">${price}</p>
+  <p className="food-item-price">{formatCurrencyINR(price)}</p>
       </div>
     </div>
   );

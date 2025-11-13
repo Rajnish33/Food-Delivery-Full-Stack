@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { assets } from "../../assets/assets";
+import formatCurrencyINR from "../../utils/formatCurrency";
 import { useContext } from "react";
 import { StoreContext } from "../../context/StoreContext";
 import { useNavigate } from "react-router-dom";
@@ -82,7 +83,7 @@ const Orders = ({ url }) => {
               <p className="order-item-phone">{order.address.phone}</p>
             </div>
             <p>Items: {order.items.length}</p>
-            <p>${order.amount}</p>
+            <p>{formatCurrencyINR(order.amount)}</p>
             <select
               onChange={(event) => statusHandler(event, order._id)}
               value={order.status}
